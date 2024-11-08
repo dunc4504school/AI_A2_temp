@@ -11,7 +11,7 @@ class Constraint:
         self.node2 = node2
 
     def __str__(self) -> str:
-        return f"{str(self.node1):<28} --> {str(self.node2)}"
+        return f"{str(self.node1):<29} != {str(self.node2)}"
 
     def revise(self) -> bool:
         change = False

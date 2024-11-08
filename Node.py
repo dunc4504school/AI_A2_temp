@@ -5,18 +5,19 @@ from typing import Callable, List, Optional, Tuple, Set
 
 
 class Node:
-    def __init__(self, x: int, y: int, starting: str) -> None:
+    def __init__(self, x: int, y: int, starting: str, sudoku: Sudoku) -> None:
         self.x = x
         self.y = y
+        self.sudoku = sudoku
         self.constraints = None
         self.domain = self.get_initial_domain(starting)
         self.initial = len(self.domain) == 1
 
     def __str__(self) -> str:
-        return f"y:{self.y} x:{self.x} " + f"[{','.join(map(str, self.domain))}]"
+        return f"y:{self.y} x:{self.x} " + f"d:[{','.join(map(str, self.domain))}]"
 
     def get_state(self) -> str:
-        return '_' if len(self.domain) > 1 else str(self.domain[0])
+        return '_' if len(self.domain) != 1 else str(self.domain[0])
 
     def print_constraints(self) -> None:
         for con in self.constraints:
@@ -36,3 +37,12 @@ class Node:
         """Resets the node's domain to its full range (1-9) if it was initially empty."""
         if not self.initial:
             self.domain = list(range(1, 10))
+
+    def is_consistent(self, value) -> bool:
+        
+        for constraint in self.constraints:
+            if len(constraint.node1.domain) == 1 and \
+                constraint.node1.domain[0] == value:
+
+                return False
+        return True
