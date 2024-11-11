@@ -6,6 +6,7 @@ from typing import List, Optional, Set
 
 from Constraint import Constraint
 from Node import Node
+import matplotlib.pyplot as plt
 
 
 class Sudoku:
@@ -16,6 +17,7 @@ class Sudoku:
         self.create_binary_constraints()  #Constraints
         self.initial_completed = self.get_completed_count() #Count Boxs Known
         self.queue_length = [] 
+        self.domain_length = []
 
     # Creates a Sudoku Board from a .txt file
     def create(self, path: str) -> List[List[Node]]:
@@ -71,6 +73,12 @@ class Sudoku:
         queue, queue_set = deque(self.constraints), set(self.constraints)
         while queue:
             self.queue_length.append(len(queue_set)) #Mark Queue Length At This Step
+            #self.domain_length.append(sum([len(node.domain) for node for row in self.board]))
+
+            self.domain_length.append(sum(len(node.domain) for row in self.board for node in row))
+
+
+
             constraint = queue.popleft()
             queue_set.remove(constraint)
             if constraint.revise():  #If domain has been changed
@@ -103,7 +111,7 @@ class Sudoku:
         return None
 
     #Solves A Sudoku Board Using AC_3 and Backtracking Search Algorithm
-    def solve(self) -> None:
+    def solve(self, distinguish_initial = False, plot=False) -> None:
 
         #Already Solved
         if self.is_solved(): print("Already Solved:")
@@ -126,12 +134,23 @@ class Sudoku:
                 if BTS_result == None: print("After AC_3:   Invalid Puzzle Discovered")
                 #Succeeded
                 else: print("After BTS:   81 - Solved")
-        print()
-        self.print_board()
+        self.print_board(distinguish_initial)
+        if plot: self.plot_AC_3()
 
 
     #Prints A Copy Of The Boards Current State
-    def print_board(self) -> None:
+    def print_board(self, distinguish_initial = False) -> None:
         print(f"Completed(Initial): {self.get_completed_count()}/81({self.initial_completed})")
         for row in self.board:
-            print(",".join([node.get_state() for node in row]))
+            print(",".join([node.get_state(distinguish_initial) for node in row]))
+
+        
+    def plot_AC_3(self):
+        plt.plot(self.queue_length, marker='o', color='red')
+        plt.plot(self.domain_length, marker='*', color='blue')
+        plt.xlabel("Iteration")
+        plt.ylabel("Queue(red) / Domain (blue) length")
+        plt.title("Size Of Queue(red) and Size Of Domain(blue) at Iteration Of AC-3")
+        plt.grid(True)
+        plt.show()
+        

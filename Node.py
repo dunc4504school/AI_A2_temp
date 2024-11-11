@@ -38,8 +38,20 @@ class Node:
 
 
     #Returns The Domain (unknown, or known value) for string output
-    def get_state(self) -> str:
-        return '_' if len(self.domain) != 1 else str(self.domain[0])
+    def get_state(self, distinguish_initial) -> str:
+        if len(self.domain) != 1 :
+            return '_'
+        
+        else:
+            if not distinguish_initial:
+                return str(self.domain[0])
+            else:
+
+                if self.initial:
+                    return f"[{str(self.domain[0])}]"
+                else:
+                    return f'_{str(self.domain[0])}_'
+        
 
     #Creates A String Output For Node
     def __str__(self) -> str:
